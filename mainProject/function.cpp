@@ -3,8 +3,8 @@
 //  WIFI
 void WiFiSetup( void )
 {
-  const char* ssid     = "...";
-  const char* password = "...";
+  const char* ssid     = "logitec-00f466";
+  const char* password = "9052796934449";
 
   // We start by connecting to a WiFi network
   Serial.println();
@@ -14,14 +14,14 @@ void WiFiSetup( void )
   while (WiFi.status() != WL_CONNECTED) {
     delay(500);
     Serial.print(".");
-  }
+  } 
   Serial.println("WiFi connected");
 }
 
 SINT upload( String readerID )
 {
   //HTTPS-Server
-  const char* host = "... .ngrok.io"; //ngrok
+  const char* host = "95f53726.ngrok.io"; //ngrok
   const int port = 443;  //https
   
   ServerCommunication sc;
@@ -33,11 +33,11 @@ SINT upload( String readerID )
   }
     
   /* --- リクエストJSONの作成 --- */
-  String reqData = "{ \"foo\" : \" "+ readerID +" \" }"; 
-  String url = "/api/foo";
+  String reqData = "{ \"device_id\": \"sample\", \"data\": { \"book_id\": 1, \"q_no\": 1, \"solution\": 1}}"; 
+  String url = "/work/reader";
 
   //Fingerprint は sc.post に入っている
-  sc.post("/api/foo",reqData, String(host)); //POST処理
+  sc.post(url,reqData, String(host)); //POST処理
   delay(300);
   Serial.println("POST Done");
 }

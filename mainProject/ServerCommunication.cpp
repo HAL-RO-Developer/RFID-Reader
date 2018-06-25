@@ -17,7 +17,7 @@ SSHT ServerCommunication::connect(String host, String port )
 
 void ServerCommunication::post(String url, String data, String host)
 {
-  const char* fingerprint = "‎45 71 78 9E 29 A8 36 8F D8 F8 43 3E 28 C4 56 E8 11 63 69 D8";
+  const char* fingerprint = "45 71 78 9E 29 A8 36 8F D8 F8 43 3E 28 C4 56 E8 11 63 69 D8";
   if (client.verify(fingerprint, host.c_str())) {
     Serial.println("certificate matches");
   } else {
@@ -35,7 +35,6 @@ void ServerCommunication::post(String url, String data, String host)
   client.println("POST "+ url +" HTTP/1.1");
   /* HTTP HEADER */
   client.println("Host:" + host);
-  client.println("Accept: application/json");
   client.println("Content-Type: application/json");
   client.print("Content-Length: ");
   client.println(body.length());

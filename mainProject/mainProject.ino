@@ -28,12 +28,12 @@ void setup()
   WiFiSetup();
   //Reader Setup
   MFRCSetup();
+  Serial.println("RFID待ち... ");
 }
 
 void loop()
 {
   String readID;
-  
   if ( ! MF.PICC_IsNewCardPresent()) { return; } //Wait for new IC
   if ( ! MF.PICC_ReadCardSerial()) { return; }   //Found, then Read IC
   

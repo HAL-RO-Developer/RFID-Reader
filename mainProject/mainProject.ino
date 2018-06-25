@@ -3,10 +3,8 @@
 #include "ServerCommunication.h"
 #include "function.h"
 
-WiFiClient client;             //Wifi Instance
-
 //RFID's
-constexpr uint8_t RST_PIN = 0; //PIN 0 as RFID's RST
+constexpr uint8_t RST_PIN = 15;//PIN 15 as RFID's RST
 constexpr uint8_t SS_PIN = 2;  //PIN 2 as RFID's SDA
 #define LED_PIN 4              //PIN 4 as LED
 const int buzzer = 5;          //PIN 5 as Buzzer

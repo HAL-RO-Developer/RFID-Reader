@@ -21,7 +21,7 @@ void WiFiSetup( void )
 SINT upload( String readerID )
 {
   //HTTPS-Server
-  const char* host = "95f53726.ngrok.io"; //ngrok
+  const char* host = "74a50909.ngrok.io"; //ngrok
   const int port = 443;  //https
   
   ServerCommunication sc;
@@ -33,7 +33,7 @@ SINT upload( String readerID )
   }
     
   /* --- リクエストJSONの作成 --- */
-  String reqData = "{ \"device_id\": \"sample\", \"data\": { \"book_id\": 1, \"q_no\": 1, \"solution\": 1}}"; 
+  String reqData = "{ \"device_id\": \"NxuCgLt49qyc\", \"data\": { \"book_id\": 1, \"q_no\": 1, \"solution\": 1}}"; 
   String url = "/work/reader";
 
   //Fingerprint は sc.post に入っている

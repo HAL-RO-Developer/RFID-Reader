@@ -3,8 +3,10 @@
 #include "ServerCommunication.h"
 #include "function.h"
 
+WiFiClient client;             //Wifi Instance
+
 //RFID's
-constexpr uint8_t RST_PIN = 15;//PIN 15 as RFID's RST
+constexpr uint8_t RST_PIN = 0; //PIN 0 as RFID's RST
 constexpr uint8_t SS_PIN = 2;  //PIN 2 as RFID's SDA
 #define LED_PIN 4              //PIN 4 as LED
 const int buzzer = 5;          //PIN 5 as Buzzer
@@ -27,18 +29,20 @@ void setup()
   //Reader Setup
   MFRCSetup();
   Serial.println("RFID待ち... ");
+
+  upload(readID);
 }
 
 void loop()
 {
   String readID;
-  if ( ! MF.PICC_IsNewCardPresent()) { return; } //Wait for new IC
-  if ( ! MF.PICC_ReadCardSerial()) { return; }   //Found, then Read IC
+  //if ( ! MF.PICC_IsNewCardPresent()) { return; } //Wait for new IC
+  //if ( ! MF.PICC_ReadCardSerial()) { return; }   //Found, then Read IC
   
-  readID = MFRCTake(); //Take IC's ID
+  //readID = MFRCTake(); //Take IC's ID
   Serial.println("ReaderID : "+readID);
   //サーバにPOSTする
-  upload(readID);
+  //upload(readID);
   //ブザーを鳴らす
   Bip();
   delay(1000);

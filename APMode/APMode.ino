@@ -1,3 +1,4 @@
+
 #include <string.h>             /* 初期化関連 */
 #include "ArduinoLibrary.h"
 #include "System.h"             /* システム共通データ定義ヘッダ */
@@ -5,37 +6,41 @@
 
 #define APSWT   ( 0   )        /* APモードスイッチ */
 #define SLPR    ( 4  )        /* ステータスランプ */
+#define TIMEOUT ( 30000 )
 
 const   SCHR*   settings    = "/settings.json";
-const   SCHR*   ap_ssid     = "ESP8266";
+const   SCHR*   ap_ssid     = "caseAESP";
 const   SCHR*   ap_pass     = "password";
 
+WIFICONFIG internet;
 ESP8266WebServer server( 80 );
 IPAddress ip( 192, 168, 4, 1 );
 IPAddress subnet( 255, 255, 255, 0 );
 
-INFO_COMMON* common
-
 /* --- プロトタイプ宣言 --- */
 void deviceInit();
-void getWiFiConfig( INFO_COMMON* common );
-void setupStateAp( INFO_COMMON* common );
 void handleRootGet();
 void handleRootPost();
+void setupStateAp();
+void getWiFiConfig();
+void connectRouter();
 
 void setup()
 {
   deviceInit();
+  Serial.println("wait 3second for AP button");
+  Serial.println("Pushed = AP, Release = none ");
+  delay(3000); //ボタン待ち
 
-  delay(3000);
-  /* --- 初期状態設定 --- */
-  Serial.println(digitalRead(APSWT));
-  
   if(digitalRead(APSWT)==LOW){
-    //setupStateAp(common);
-    Serial.println("High");
+    Serial.println("Button is LOW");
+    setupStateAp();
+  } else {
+    Serial.println("Button is HIGH");
+    connectRouter();
   }
-  Serial.println("if Passed");
+
+  delay(100);
 }
 
 void loop()
@@ -51,32 +56,18 @@ void deviceInit()
   Serial.println();
   /* APスイッチ */
   pinMode( APSWT, INPUT );
-  
-  /* ファイルシステム */
-  //SPIFFS.begin();   //<==これ
-}
 
-void setupStateAp( INFO_COMMON* common )
-{
-   /* MACアドレス取得 */
+  /* MACアドレス取得 */
   byte mac_byte[6];
   WiFi.macAddress( mac_byte );
   for( int i = 0; i < 6; i++ ){
-      common->mac += String( mac_byte[i], HEX );
+      internet.mac += String( mac_byte[i], HEX );
   }
   
-  getWiFiConfig( common );
-  WiFi.mode(WIFI_AP);
-  WiFi.softAPConfig(ip, ip, subnet);
-  WiFi.softAP( ap_ssid, ap_pass );
-  Serial.println();     
-  Serial.println(WiFi.softAPIP());  
-  
-  server.on( "/", HTTP_GET, handleRootGet );
-  server.on( "/", HTTP_POST, handleRootPost );
-  server.begin();
-  
+  Serial.println("taken MAC");
   delay(1);
+  /* ファイルシステム */
+  SPIFFS.begin();
 }
 
 void handleRootGet()
@@ -86,7 +77,7 @@ void handleRootGet()
     html += "<form method='post'>";
     html += "  SSID : <input type='text' name='ssid' placeholder='SSID'><br>";
     html += "  PASS : <input type='password' name='pass' placeholder='PASS'><br>";
-    html += "  Device ID  : <input type='text' name='dev' placeholder='DEV'><br>";
+    html += "  Device ID  : <input type='text' name='device_id' placeholder='Device ID'><br>";
     html += "  <input type='submit'><br>";
     html += "</form>";
     
@@ -97,17 +88,18 @@ void handleRootPost()
 {
     String  ssid = server.arg("ssid");
     String  pass = server.arg("pass");
-    String  dev  = server.arg("dev");
+    String  device_id  = server.arg("device_id");
 
-    /* JSON作成 */
+    // JSON作成
     String json = "{";
     json += "\"ssid\":\"" + ssid + "\",";
     json += "\"pass\":\"" + pass + "\",";
-    json += "\"dev\":\""  + dev  + "\",";
+    json += "\"device_id\":\""  + device_id  + "\",";
     
     File    fd = SPIFFS.open( settings, "w" );
     fd.println( json );
     fd.close();
+    
     
     String html = "";
     html += "<h1>WiFi Settings</h1>";
@@ -115,12 +107,25 @@ void handleRootPost()
     html += "<table>";
     html += "  <tr><td>SSID</td><td>" + ssid + "</td></tr>";
     html += "  <tr><td>PASS</td><td>[Not display]</td></tr>";
-    html += "  <tr><td>DEV</td><td>" + dev + "</td></tr>";
+    html += "  <tr><td>Device ID</td><td>" + device_id + "</td></tr>";
     html += "</table>";
     server.send( 200, "text/html", html );
 }
 
-void getWiFiConfig( INFO_COMMON* common )
+void setupStateAp()
+{
+  WiFi.mode(WIFI_AP);
+  WiFi.softAPConfig(ip, ip, subnet);
+  WiFi.softAP( ap_ssid, ap_pass );
+  Serial.println();     
+  Serial.println(WiFi.softAPIP()); 
+  
+  server.on( "/", HTTP_GET, handleRootGet );
+  server.on( "/", HTTP_POST, handleRootPost );
+  server.begin();
+}
+
+void getWiFiConfig( )
 {
     SCHR json[256];
     
@@ -136,17 +141,37 @@ void getWiFiConfig( INFO_COMMON* common )
 
     const SCHR* ssid = root["ssid"];
     const SCHR* pass = root["pass"];
-    const SCHR* dev  = root["dev"];
+    const SCHR* device_id = root["device_id"];
 
-    (common->config).ssid = String( ssid );
-    (common->config).pass = String( pass );
-    (common->config).device_id = String( dev );
+    internet.ssid = String( ssid );
+    internet.pass = String( pass );
+    internet.device_id = String( device_id );
 
 #if DEBUG 
-    Serial.println("SSID:" + (common->config).ssid);
-    Serial.println("PASS:" + (common->config).pass);
-    Serial.println("DEV :" + (common->config).dev);
+    Serial.println("SSID:" + internet.ssid);
+    Serial.println("PASS:" + internet.pass);
+    Serial.println("DEV :" + internet.device_id);
 #endif    
+}
+
+void connectRouter()
+{
+    Serial.print("Connecting to ");
+    Serial.println(internet.ssid.c_str());
+    WiFi.begin( internet.ssid.c_str(), internet.pass.c_str() );
+    WiFi.mode( WIFI_STA );
+
+    SINT time;
+    int start = millis();
+    while( WiFi.status() != WL_CONNECTED ){
+        int current = millis();
+        Serial.print(".");
+        if( ( time = current - start ) >= TIMEOUT ){
+            break;
+        }
+        delay( 100 );
+    }
+    Serial.println("WiFi connected");
 }
 
 /* Copyright HAL College of Technology & Design */

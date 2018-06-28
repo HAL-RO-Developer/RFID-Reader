@@ -16,18 +16,11 @@
 /* --- 情報管理構造体 --- */
 
 typedef struct{
-    String ssid;        /* 接続ルーターSSID      */
-    String pass;        /* 接続ルーターパスワード */
-    String device_id;   /* デバイスID            */
+  String mac;
+  String ssid;        /* 接続ルーターSSID      */
+  String pass;        /* 接続ルーターパスワード */
+  String device_id;   /* デバイスID            */
 } WIFICONFIG;
-
-/* 状態共通情報 */
-typedef struct{
-    WIFICONFIG config;
-    String mac;
-    SSHT data1;
-    SSHT data2;
-} INFO_COMMON;
 
 #endif  /* __INFO_STRUCT_H__ */
 

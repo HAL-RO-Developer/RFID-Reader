@@ -13,12 +13,6 @@
 #define HTTP_STATUS_FORBIDDEN ( 403 )
 #define HTTP_STATUS_NOT_FOUND   ( 404 )
 
-/* --- 情報管理構造体 --- */
-typedef struct{
-    String ssid;        /* 接続ルーターSSID      */
-    String pass;        /* 接続ルーターパスワード */
-} WIFICONFIG;
-
 class ServerCommunication{
   private:
     WiFiClientSecure client;

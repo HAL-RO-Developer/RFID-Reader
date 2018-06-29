@@ -1,75 +1,78 @@
-#include <string.h>
+/*
+    Main.ino
+    システムメイン
+
+    Created 2018/06/28
+    By Nakajim Yam
+*/
+/* Include Files */
 #include "ArduinoLibrary.h"
 #include "ServerCommunication.h"
 #include "function.h"
+#include "constants.h"
+#include "System.h"
 
-WiFiClient client;             //Wifi Instance
-
-//RFID's
-constexpr uint8_t RST_PIN = 0; //PIN 0 as RFID's RST
-constexpr uint8_t SS_PIN = 2;  //PIN 2 as RFID's SDA
-#define LED_PIN 4              //PIN 4 as LED
-const int buzzer = 5;          //PIN 5 as Buzzer
 MFRC522 MF(SS_PIN, RST_PIN);  //Create MF instance
+WiFiClient client;             //Wifi Instance
+WIFICONFIG wifi;
 
-void MFRCSetup( void );  //RFID Setup
-String MFRCTake( void ); //Read RFID ID
-void Bip( void );        //Buzzer ON
+/* --- プロトタイプ宣言 --- */
+void deviceInit( void );
 
 void setup() 
 {
-  Serial.begin(9600);
-  delay(10);
-  pinMode(LED_PIN, OUTPUT);
-  pinMode(buzzer, OUTPUT); //Buzzer
-  digitalWrite(LED_PIN, LOW);
-  
-  //Wifi Setup
-  WiFiSetup();
-  //Reader Setup
-  MFRCSetup();
-  Serial.println("RFID待ち... ");
+  deviceInit();
+  Serial.println("wait 3second for AP button");
+  Serial.println("Pushed = AP, Release = none");
+  delay(3000); //ボタン待ち
 
-  upload(readID);
+  if(digitalRead(APSWT)==LOW){
+    Serial.println("WiFi Settings");
+    setupWifi();
+  } 
+  else if(digitalRead(APSWT)==HIGH) {
+    connectRouter();
+  }
 }
 
 void loop()
 {
   String readID;
-  //if ( ! MF.PICC_IsNewCardPresent()) { return; } //Wait for new IC
-  //if ( ! MF.PICC_ReadCardSerial()) { return; }   //Found, then Read IC
-  
-  //readID = MFRCTake(); //Take IC's ID
-  Serial.println("ReaderID : "+readID);
-  //サーバにPOSTする
-  //upload(readID);
-  //ブザーを鳴らす
-  Bip();
-  delay(1000);
-}
-
-void MFRCSetup ( void )
-{
-  SPI.begin();   // Init SPI bus
-  MF.PCD_Init(); // Init MF 
-}
-
-String MFRCTake( void )
-{
-  String content= "";
-  //UIDを読み込む
-  for (byte i = 0; i < MF.uid.size; i++) {
-    content.concat(String(MF.uid.uidByte[i] < 0x10 ? " 0" : " "));
-    content.concat(String(MF.uid.uidByte[i], HEX));
+    
+  if(wifi.device_id==NULL){
+    registerDevice();
   }
-  content.toUpperCase();
-  return content;
+  else {
+    //if ( ! MF.PICC_IsNewCardPresent()) { return; } //Wait for new IC
+    //if ( ! MF.PICC_ReadCardSerial()) { return; }   //Found, then Read IC
+
+    //Take IC's ID
+    readID = MFRCTake();
+    Serial.println("ReaderID : "+readID);
+    //サーバにPOSTする
+    //upload(readID);
+    //ブザーを鳴らす
+    Bip();
+    delay(1000);
+  }
 }
 
-void Bip ( void )
+void deviceInit()
 {
-  tone(buzzer,1000);
-  delay(100);
-  noTone(buzzer);
+  /* シリアル通信 */
+  Serial.begin(115200);
+  Serial.println();
+  /* スイッチ */
+  pinMode(APSWT, INPUT );
+  pinMode(LED_PIN, OUTPUT);
+  pinMode(BUZ_PIN, OUTPUT);
+  digitalWrite(LED_PIN, LOW);
+
+  /* RFID初期化 */
+  MF.PCD_Init();
+  /* ファイルシステム */
+  SPIFFS.begin();
+  /* SPI通信 */
+  SPI.begin();
 }
 

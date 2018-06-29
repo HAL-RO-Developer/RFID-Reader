@@ -18,6 +18,7 @@
 #include <ESP8266HTTPClient.h>
 #include <FS.h>
 #include <Ticker.h>
+#include <ArduinoJson.h>
 #include <SPI.h>
 #include <MFRC522.h>
 

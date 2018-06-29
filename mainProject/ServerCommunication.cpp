@@ -61,6 +61,7 @@ SINT ServerCommunication::response(String* data)
   int bodyPos =  response.indexOf("\r\n\r\n") + 4;
   *data = response.substring(bodyPos);
 
+  Serial.println("Taken response");
   if(client.connected()){
     client.stop();
   }

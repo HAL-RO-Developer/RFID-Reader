@@ -15,7 +15,7 @@
 #define BUZ_PIN ( 5    )  /* PIN 5 as Buzzer              */
 #define APSWT   ( 0    )  /* PIN 0 as WiFiSetting(Server) */
 #define TIMEOUT ( 30000)  /* WiFi Timeout                 */
-#define RST_PIN ( 15   )  /* PIN 0 as RFID's RST          */
-#define SS_PIN  ( 2    )  /* PIN 2 as RFID's SDA          */
+constexpr uint8_t RST_PIN = 0;          // Configurable, see typical pin layout above
+constexpr uint8_t SS_PIN = 2;         // Configurable, see typical pin layout above
 
 #endif /* __CONSTANTS_H__ */

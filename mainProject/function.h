@@ -13,8 +13,16 @@ SINT upload         ( String );
 SINT registerDevice ( void );
 void setupWifi      ( void );
 void getWiFiConfig  ( void );
+void getDeviceConfig( void );
 void connectRouter  ( void );
 String MFRCTake     ( void );
 void Bip            ( void );
+
+/* Root */
+void handleRootMain ( void );
+void handleGetWifi  ( void );
+void handlePostWifi ( void );
+void handleGetPin   ( void );
+void handlePostPin  ( void );
 
 #endif /* __FUNCTION_H__ */

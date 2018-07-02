@@ -8,13 +8,8 @@
 ESP8266WebServer server( 80 );
 IPAddress ip( 192, 168, 4, 1 );
 IPAddress subnet( 255, 255, 255, 0 );
-WIFICONFIG internet;
-/* Root */
-void handleRootMain ( void );
-void handleGetWifi  ( void );
-void handlePostWifi ( void );
-void handleGetPin   ( void );
-void handlePostPin  ( void );
+extern WIFICONFIG internet;
+String mac_id;
 
 SINT upload( String readerID )
 {
@@ -27,13 +22,12 @@ SINT upload( String readerID )
   }
     
   /* --- リクエストJSONの作成 --- */
-  String reqData = "{ \"device_id\": \"NxuCgLt49qyc\", \"data\": { \"book_id\": 1, \"q_no\": 1, \"solution\": 1}}"; 
-  String url = "/work/reader";
+  String reqData = "{ \"device_id\": \""+ internet.device_id +"\", \"uuid\": \""+ readerID +"\"}"; 
+  String url = "/thing/reader";
 
   //Fingerprint は sc.post に入っている
   sc.post(url,reqData, String(host)); //POST処理
   delay(300);
-  Serial.println("POST Done");
 }
 
 SINT registerDevice()
@@ -45,29 +39,40 @@ SINT registerDevice()
     Serial.println("connection failed");
     return SYSTEM_NG;
   }
-    
+  Serial.println("MAC Address : "+ mac_id);  
   /* --- リクエストJSONの作成 --- */
-  String reqData = "{ \"pin\": \""+ internet.pin +"\", \"mac\": \""+ internet.mac +"\""; 
+  String reqData = "{ \"pin\" : \""+ internet.pin +"\", \"mac\" : \""+ mac_id +"\" }"; 
   String url = "/thing/registration";
 
   //Fingerprint は sc.post に入っている
   sc.post(url,reqData, String(host)); //POST処理
   delay(300);
-  sc.response(internet.device_id);
+  sc.response(&internet.device_id);
   delay(300);
-  Serial.println("Device Registered");
+
+  // JSON作成
+  String json = "{";
+  json += "\"pin\":\"\",";
+  json += "\"device_id\":\"" + internet.device_id + "\"";
+  json += "}";
+    
+  File    fd = SPIFFS.open( setting_p, "w" );
+  fd.println( json );
+  fd.close();
+  
+  Serial.println("Device Registered : " +internet.device_id);
 }
 
 void getWiFiConfig( )
 {
   SCHR json_w[256];
   SCHR json_p[256];
-
+  
   /* MACアドレス取得 */
   byte mac_byte[6];
   WiFi.macAddress( mac_byte );
   for( int i = 0; i < 6; i++ ){
-      internet.mac += String( mac_byte[i], HEX );
+      mac_id += String( mac_byte[i], HEX );
   }
   delay(1);
   
@@ -78,7 +83,7 @@ void getWiFiConfig( )
   File   fd_p = SPIFFS.open( setting_p, "r" );
   String jsonStringP = fd_p.readString();
   fd_p.close();
-  
+    
   Serial.print(jsonStringW);
   Serial.print(jsonStringP);
   jsonStringW.toCharArray( json_w, jsonStringW.length() + 1 );
@@ -87,14 +92,16 @@ void getWiFiConfig( )
   DynamicJsonBuffer jb;
   JsonObject& root_w = jb.parseObject( json_w );
   JsonObject& root_p = jb.parseObject( json_p );
-  
+    
   const SCHR* ssid = root_w["ssid"];
   const SCHR* pass = root_w["pass"];
   const SCHR* pin = root_p["pin"];
-
+  const SCHR* dev = root_p["device_id"];
+    
   internet.ssid = String( ssid );
   internet.pass = String( pass );
-  internet.pin = String( pin ); 
+  internet.pin = String( pin );
+  internet.device_id = String( dev );
 }
 
 void connectRouter()
@@ -202,7 +209,8 @@ void handlePostPin()
   
   // JSON作成
   String json = "{";
-  json += "\"pin\":\"" + pin + "\"";
+  json += "\"pin\":\"" + pin + "\",";
+  json += "\"device_id\":\"\",";
   json += "}";
     
   File    fd = SPIFFS.open( setting_p, "w" );

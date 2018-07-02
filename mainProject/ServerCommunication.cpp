@@ -19,16 +19,15 @@ void ServerCommunication::post(String url, String data, String host)
 {
   const char* fingerprint = "45 71 78 9E 29 A8 36 8F D8 F8 43 3E 28 C4 56 E8 11 63 69 D8";
   if (client.verify(fingerprint, host.c_str())) {
-    Serial.println("certificate matches");
+    Serial.print("Posting  :");
   } else {
-    Serial.println("certificate doesn't match");
+    Serial.print("certificate doesn't match.");
   }
   
   if( !client.connected() ){
     connect( host, port );
   }
 
-  Serial.println("func: POST-ing");
   this->url = url;
   String body = data;
   /* HTTP REQUEST */
@@ -42,6 +41,7 @@ void ServerCommunication::post(String url, String data, String host)
   /* HTTP BODY */
   client.print(body);
  
+  Serial.println(" Done");
   delay(10);
 }
 
@@ -55,18 +55,25 @@ SINT ServerCommunication::response(String* data)
   String response = client.readString();
   int statusPos = response.indexOf("HTTP/1.1 ") + 9;
   String statusString = response.substring(statusPos, statusPos + 3);
-  status = statusString.toInt();
 
   /* body位置検索 */
-  int bodyPos =  response.indexOf("\r\n\r\n") + 4;
-  *data = response.substring(bodyPos);
+  int bodyPos = response.indexOf("\r\n\r\n") + 4;
+  String res  = response.substring(bodyPos);
 
-  Serial.println("Taken response");
+  Serial.println(res);
+  
+  StaticJsonBuffer<1024> JSONBuffer;
+  JsonObject& root = JSONBuffer.parseObject(res);
+
+  delay(100);
+  Serial.print("NOW is DEVICE COPY : ");
+  const char * device_id = root["device_id"];
+  *data = String(device_id);
+  
+  Serial.println(" Responsed");
   if(client.connected()){
     client.stop();
   }
-  
-  return status;
 }
 
 void ServerCommunication::setUrl(String url)

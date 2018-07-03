@@ -210,7 +210,7 @@ void handlePostPin()
   // JSON作成
   String json = "{";
   json += "\"pin\":\"" + pin + "\",";
-  json += "\"device_id\":\"\",";
+  json += "\"device_id\":\"\"";
   json += "}";
     
   File    fd = SPIFFS.open( setting_p, "w" );

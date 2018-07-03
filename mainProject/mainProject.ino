@@ -26,6 +26,7 @@ void setup()
   deviceInit();
   
   if(internet.device_id==NULL){
+    Serial.println("testDevice1HEre");
     registerDevice();
   }
 }
@@ -45,7 +46,6 @@ void loop()
   //ブザーを鳴らす
   Bip();
   delay(1000);
-  }
 }
 
 void deviceInit()

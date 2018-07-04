@@ -1,3 +1,10 @@
+/*
+    function.h
+    共通関数ヘッダー定義
+
+    created 2018/06/28
+    by Nakajim Yam
+*/
 #ifndef __FUNCTION_H__
 #define __FUNCTION_H__
 
@@ -16,7 +23,7 @@ void getWiFiConfig  ( void );
 void getDeviceConfig( void );
 void connectRouter  ( void );
 String MFRCTake     ( void );
-void Bip            ( void );
+void bip            ( void );
 
 /* Root */
 void handleRootMain ( void );

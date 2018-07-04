@@ -38,13 +38,13 @@ void loop()
   if ( ! MF.PICC_IsNewCardPresent()) { return; } //Wait for new IC
   if ( ! MF.PICC_ReadCardSerial()) { return; }   //Found, then Read IC
 
-  //Take IC's ID
+  //RFIDのIDを読込む
   readID = MFRCTake();
   Serial.println(readID);
   //サーバにPOSTする
   upload(readID);
   //ブザーを鳴らす
-  Bip();
+  bip();
   delay(1000);
 }
 
@@ -53,19 +53,18 @@ void deviceInit()
   /* シリアル通信 */
   Serial.begin(115200);
   Serial.println();
-  /* スイッチ */
-  pinMode(APSWT, INPUT );
-  pinMode(LED_PIN, OUTPUT);
-  pinMode(BUZ_PIN, OUTPUT);
-  digitalWrite(LED_PIN, LOW);
-  
+  /* ピン設定 */
+  pinMode(APSWT, INPUT );    /* push Button */
+  pinMode(LED_PIN, OUTPUT);  /* LED         */
+  pinMode(BUZ_PIN, OUTPUT);  /* Buzzer      */
+  digitalWrite(LED_PIN, LOW);/* LED OFF     */
   /* SPI通信 */
   SPI.begin();
   /* RFID初期化 */
   MF.PCD_Init();
   /* ファイルシステム */
   SPIFFS.begin();
-
+  /* マイコンのモード設定 */
   Serial.println("wait 3second for AP button");
   Serial.println("Pushed = AP, Release = none");
   delay(3000); //ボタン待ち

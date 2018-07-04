@@ -19,7 +19,7 @@ String MFRCTake( void )
   return content;
 }
 
-void Bip ( void )
+void bip ( void )
 {
   tone(BUZ_PIN,1000);
   delay(100);

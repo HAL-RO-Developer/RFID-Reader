@@ -1,3 +1,10 @@
+/*
+    config.h
+    接続関連データ定義ヘッダ
+
+    Created 2018/06/28
+    By Nakajim Yam
+*/
 #ifndef __CONFIG_H__
 #define __CONFIG_H__
 

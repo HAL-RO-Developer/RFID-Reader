@@ -14,9 +14,7 @@
 #include "System.h"
 
 /* --- 情報管理構造体 --- */
-
 typedef struct{
-  String mac;
   String ssid;        /* 接続ルーターSSID        */
   String pass;        /* 接続ルーターパスワード  */
   String pin;         /* デバイスからもらったPIN */

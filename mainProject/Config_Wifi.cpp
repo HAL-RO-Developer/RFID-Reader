@@ -14,42 +14,37 @@ String mac_id;
 SINT upload( String readerID )
 {
   ServerCommunication sc;
-  
-  // Use WiFiClient class to create TCP connections
+  /* サーバ接続 */
   if (!sc.connect(String(host), String(port)) == SERVER_CONNECT_ERROR) {
     Serial.println("connection failed");
     return SYSTEM_NG;
   }
     
-  /* --- リクエストJSONの作成 --- */
+  /* リクエストJSONの作成 */
   String reqData = "{ \"device_id\": \""+ internet.device_id +"\", \"uuid\": \""+ readerID +"\"}"; 
   String url = "/thing/reader";
-
-  //Fingerprint は sc.post に入っている
-  sc.post(url,reqData, String(host)); //POST処理
+  sc.post(url,reqData, String(host));  /* POST     */
   delay(300);
 }
 
 SINT registerDevice()
 {
   ServerCommunication sc;
-  
-  // Use WiFiClient class to create TCP connections
+  /* サーバ接続 */
   if (!sc.connect(String(host), String(port)) == SERVER_CONNECT_ERROR) {
     Serial.println("connection failed");
     return SYSTEM_NG;
   }
-  Serial.println("MAC Address : "+ mac_id);  
-  /* --- リクエストJSONの作成 --- */
+   
+  /*   リクエストJSONの作成 */
   String reqData = "{ \"pin\" : \""+ internet.pin +"\", \"mac\" : \""+ mac_id +"\" }"; 
   String url = "/thing/registration";
-
-  //Fingerprint は sc.post に入っている
-  sc.post(url,reqData, String(host)); //POST処理
+  sc.post(url,reqData, String(host));  /* POST     */
   delay(300);
-  sc.response(&internet.device_id);
+  sc.response(&internet.device_id);    /* RESPONSE */
   delay(300);
-
+  
+  /* デバイスＩＤを保存する */
   // JSON作成
   String json = "{";
   json += "\"pin\":\"\",";
@@ -59,7 +54,6 @@ SINT registerDevice()
   File    fd = SPIFFS.open( setting_p, "w" );
   fd.println( json );
   fd.close();
-  
   Serial.println("Device Registered : " +internet.device_id);
 }
 

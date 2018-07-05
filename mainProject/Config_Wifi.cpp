@@ -137,8 +137,8 @@ void setupWifi()
 void handleRootMain()
 {
   String html = "";
-  html += "<h1>ESP8266 caseAESP Settings</h1>";
-  html += "<a href=\"/wifi\"> WiFi Settings<br>";
+  html += "<h1>ESP8266 caseSTUDY2018 Setting</h1>";
+  html += "<a href=\"/wifi\"> WiFi Setting<br>";
   html += "<a href=\"/pin\"> Device Registration<br>";
 
   server.send( 200, "text/html", html );
@@ -147,7 +147,7 @@ void handleRootMain()
 void handleGetWifi()
 {
   String html = "";
-  html += "<h1>WiFi Settings</h1>";
+  html += "<h1>WiFi Setting</h1>";
   html += "<form method='post'>";
   html += "  SSID : <input type='text' name='ssid' placeholder='SSID'><br>";
   html += "  PASS : <input type='password' name='pass' placeholder='PASS'><br>";
@@ -174,7 +174,7 @@ void handlePostWifi()
   fd.close();
     
   String html = "";
-  html += "<h1>WiFi Settings</h1>";
+  html += "<h1>WiFi Setting</h1>";
   html += "<p>Settings changed</p>";
   html += "<table>";
   html += "  <tr><td>SSID</td><td>" + ssid + "</td></tr>";
@@ -188,7 +188,7 @@ void handlePostWifi()
 void handleGetPin()
 {
   String html = "";
-  html += "<h1>Device Settings</h1>";
+  html += "<h1>Device Registration</h1>";
   html += "<form method='post'>";
   html += "  PIN  : <input type='text' name='pin' placeholder='PIN'><br>";
   html += "  <input type='submit'><br>";
@@ -212,8 +212,8 @@ void handlePostPin()
   fd.close();
   
   String html = "";
-  html += "<h1>WiFi Settings</h1>";
-  html += "<p>Settings changed</p>";
+  html += "<h1>Device Registration</h1>";
+  html += "<p>Registrated by</p>";
   html += "<table>";
   html += "  <tr><td>PIN</td><td>" + pin + "</td></tr>";
   html += "  <tr><td></td><td><a href=\"/\"> Back</td></tr>";
@@ -221,3 +221,4 @@ void handlePostPin()
   server.send( 200, "text/html", html );
 }
 
+/* Copyright HAL College of Technology & Design */

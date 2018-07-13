@@ -16,7 +16,7 @@
 #include "InfoStruct.h"
 
 /* --- Prototype --- */
-SINT upload         ( String );
+SINT upload         ( void );
 SINT registerDevice ( void );
 void setupWifi      ( void );
 void getWiFiConfig  ( void );
@@ -24,6 +24,12 @@ void getDeviceConfig( void );
 void connectRouter  ( void );
 String MFRCTake     ( void );
 void bip            ( void );
+
+/* LED Blink */
+void waitBlink(void);
+void apBlink(void);
+void runBlink(void);
+void regBlink(void);
 
 /* Root */
 void handleRootMain ( void );

@@ -21,6 +21,12 @@ typedef struct{
   String device_id;   /* デバイスID              */
 } WIFICONFIG;
 
+/* --- RFID管理構造体 --- */
+typedef struct{
+  String new_uuid;      /* 新しいＵＵＩＤ          */
+  String old_uuid;      /* 保存されたＵＵＩＤ      */
+}RFIDCONFIG;
+
 #endif  /* __INFO_STRUCT_H__ */
 
 /* Copyright HAL College of Technology & Design */

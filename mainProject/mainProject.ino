@@ -15,6 +15,7 @@
 MFRC522 MF(SS_PIN, RST_PIN);  //Create MF instance
 WiFiClient client;             //Wifi Instance
 WIFICONFIG internet;
+RFIDCONFIG rfid;
 
 int onetime = 0;
 
@@ -26,23 +27,25 @@ void setup()
   deviceInit();
   
   if(internet.device_id==NULL){
-    Serial.println("testDevice1HEre");
     registerDevice();
   }
 }
 
 void loop()
 {
-  String readID;
-  
+  rfid.new_uuid="";
+  waitBlink();
   if ( ! MF.PICC_IsNewCardPresent()) { return; } //Wait for new IC
   if ( ! MF.PICC_ReadCardSerial()) { return; }   //Found, then Read IC
 
   //RFIDのIDを読込む
-  readID = MFRCTake();
-  Serial.println(readID);
+  rfid.new_uuid = MFRCTake();
+  Serial.println("new uuid : " + rfid.new_uuid);
+  Serial.println("old uuid : " + rfid.old_uuid);
   //サーバにPOSTする
-  upload(readID);
+  upload();
+  //新しいUUIDを保存する
+  rfid.old_uuid = rfid.new_uuid;
   //ブザーを鳴らす
   bip();
   delay(1000);

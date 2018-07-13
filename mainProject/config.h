@@ -10,12 +10,12 @@
 
 #include "System.h"
 
-const   SCHR* host        = "a142b688.ngrok.io";
-const   SCHR* port        = "443";
+const   SCHR* port      = "443";
 
-const   SCHR*   ap_ssid   = "caseA";
-const   SCHR*   ap_pass   = "password";
+const   SCHR* ap_ssid   = "caseA";
+const   SCHR* ap_pass   = "password";
 
-const   SCHR*   setting_w = "/wifi.json";
-const   SCHR*   setting_p = "/pin.json";
+const   SCHR* setting_w = "/wifi.json";
+const   SCHR* setting_p = "/pin.json";
+const   SCHR* setting_h = "/host.json";
 #endif "__CONFIG_H__"

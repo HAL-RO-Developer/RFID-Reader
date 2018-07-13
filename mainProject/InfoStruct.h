@@ -21,10 +21,16 @@ typedef struct{
   String device_id;   /* デバイスID              */
 } WIFICONFIG;
 
+/* --- URL管理構造体 --- */
+typedef struct{
+  String host;        /* 接続ルーターSSID        */
+  String fingerprint; /* 接続ルーターパスワード  */
+} HOSTCONFIG;
+
 /* --- RFID管理構造体 --- */
 typedef struct{
-  String new_uuid;      /* 新しいＵＵＩＤ          */
-  String old_uuid;      /* 保存されたＵＵＩＤ      */
+  String new_uuid;    /* 新しいＵＵＩＤ          */
+  String old_uuid;    /* 保存されたＵＵＩＤ      */
 }RFIDCONFIG;
 
 #endif  /* __INFO_STRUCT_H__ */

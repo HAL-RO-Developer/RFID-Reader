@@ -35,11 +35,11 @@ void loop()
 {
   rfid.new_uuid="";
   waitBlink();
-  if ( ! MF.PICC_IsNewCardPresent()) { return; } //Wait for new IC
+  /*if ( ! MF.PICC_IsNewCardPresent()) { return; } //Wait for new IC
   if ( ! MF.PICC_ReadCardSerial()) { return; }   //Found, then Read IC
-
+  */
   //RFIDのIDを読込む
-  rfid.new_uuid = MFRCTake();
+  //rfid.new_uuid = MFRCTake();
   Serial.println("new uuid : " + rfid.new_uuid);
   Serial.println("old uuid : " + rfid.old_uuid);
   //サーバにPOSTする

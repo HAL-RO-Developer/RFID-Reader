@@ -1,4 +1,5 @@
 #include "ServerCommunication.h"
+extern HOSTCONFIG hosts;
 
 ServerCommunication::ServerCommunication(String host):
   host(host)
@@ -17,7 +18,7 @@ SSHT ServerCommunication::connect(String host, String port )
 
 void ServerCommunication::post(String url, String data, String host)
 {
-  const char* fingerprint = "45 71 78 9E 29 A8 36 8F D8 F8 43 3E 28 C4 56 E8 11 63 69 D8";
+  const char* fingerprint = hosts.fingerprint.c_str();
   if (client.verify(fingerprint, host.c_str())) {
     Serial.print("Posting  :");
   } else {

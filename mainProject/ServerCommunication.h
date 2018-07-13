@@ -4,6 +4,7 @@
 /* --- includeファイル --- */
 #include "ArduinoLibrary.h"  
 #include "System.h"
+#include "InfoStruct.h"
 
 #define SERVER_SUCCESS      (   1 )
 #define SERVER_CONNECT_ERROR  (  -1 )

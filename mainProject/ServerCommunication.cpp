@@ -1,5 +1,4 @@
 #include "ServerCommunication.h"
-extern HOSTCONFIG hosts;
 
 ServerCommunication::ServerCommunication(String host):
   host(host)
@@ -17,15 +16,9 @@ SSHT ServerCommunication::connect(String host, String port )
 }
 
 void ServerCommunication::post(String url, String data, String host)
-{
-  const char* fingerprint = hosts.fingerprint.c_str();
-  if (client.verify(fingerprint, host.c_str())) {
-    Serial.print("Posting  :");
-  } else {
-    Serial.print("certificate doesn't match.");
-  }
-  
+{  
   if( !client.connected() ){
+    connectRouter();
     connect( host, port );
   }
 
@@ -42,7 +35,7 @@ void ServerCommunication::post(String url, String data, String host)
   /* HTTP BODY */
   client.print(body);
  
-  Serial.println(" Done");
+  Serial.println("Posted");
   delay(10);
 }
 
@@ -60,14 +53,11 @@ SINT ServerCommunication::response(String* data)
   /* body位置検索 */
   int bodyPos = response.indexOf("\r\n\r\n") + 4;
   String res  = response.substring(bodyPos);
-
-  Serial.println(res);
   
   StaticJsonBuffer<1024> JSONBuffer;
   JsonObject& root = JSONBuffer.parseObject(res);
 
   delay(100);
-  Serial.print("NOW is DEVICE COPY : ");
   const char * device_id = root["device_id"];
   *data = String(device_id);
   
@@ -76,7 +66,6 @@ SINT ServerCommunication::response(String* data)
     client.stop();
   }
 }
-
 void ServerCommunication::setUrl(String url)
 {
   this->url = url;

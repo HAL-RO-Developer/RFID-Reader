@@ -12,13 +12,12 @@ extern WIFICONFIG internet;
 extern RFIDCONFIG rfid;
 HOSTCONFIG hosts;
 
-SINT upload( )
+void upload( )
 {
   ServerCommunication sc;
   /* サーバ接続 */
   if (!sc.connect(hosts.host, String(port)) == SERVER_CONNECT_ERROR) {
     Serial.println("connection failed");
-    return SYSTEM_NG;
   }
     
   /* リクエストJSONの作成 */
@@ -33,13 +32,13 @@ SINT upload( )
   delay(300);
 }
 
-SINT registerDevice()
+void registerDevice()
 {
+  digitalWrite(LED_PIN, HIGH);
   ServerCommunication sc;
   /* サーバ接続 */
   if (!sc.connect(hosts.host, String(port)) == SERVER_CONNECT_ERROR) {
     Serial.println("connection failed");
-    return SYSTEM_NG;
   }
    
   /*   リクエストJSONの作成 */
@@ -47,6 +46,7 @@ SINT registerDevice()
   String url = "/thing/registration";
   sc.post(url,reqData, hosts.host);  /* POST     */
   delay(300);
+  digitalWrite(LED_PIN, HIGH);
   sc.response(&internet.device_id);    /* RESPONSE */
   delay(300);
   
@@ -61,7 +61,7 @@ SINT registerDevice()
   fd.println( json );
   fd.close();
   Serial.println("Device Registered : " +internet.device_id);
-  regBlink();
+  digitalWrite(LED_PIN, LOW);
 }
 
 void getWiFiConfig( )
@@ -85,6 +85,7 @@ void getWiFiConfig( )
   Serial.print(jsonStringW);
   Serial.print(jsonStringP);
   Serial.print(jsonStringH);
+  
   jsonStringW.toCharArray( json_w, jsonStringW.length() + 1 );
   jsonStringP.toCharArray( json_p, jsonStringP.length() + 1 );
   jsonStringH.toCharArray( json_h, jsonStringH.length() + 1 );
@@ -99,38 +100,35 @@ void getWiFiConfig( )
   const SCHR* pin = root_p["pin"];
   const SCHR* dev = root_p["device_id"];
   const SCHR* host = root_h["host"];
-  const SCHR* fingerprint = root_h["fingerprint"];
   
   internet.ssid = String( ssid );
   internet.pass = String( pass );
   internet.pin = String( pin );
   internet.device_id = String( dev );
   hosts.host = String( host );
-  hosts.fingerprint = String( fingerprint );
 }
 
 void connectRouter()
 {
-  runBlink();
   getWiFiConfig();
   Serial.print("Connecting to ");
   Serial.println(internet.ssid.c_str());
   WiFi.begin( (internet.ssid).c_str(), (internet.pass).c_str() );
   WiFi.mode( WIFI_STA );
 
-  SINT time;
-  int start = millis();
   while( WiFi.status() != WL_CONNECTED ){
-      Serial.print(".");
-      delay( 500 );
+    digitalWrite(LED_PIN, HIGH);
+    delay( 400 );
+    digitalWrite(LED_PIN, LOW);
+    delay( 100 );
   }
   Serial.println("WiFi connected");
-  regBlink();
 }
 
 void setupWifi()
 {
-  apBlink();
+  digitalWrite(LED_PIN, HIGH);
+  delay(10);
   WiFi.mode(WIFI_AP);
   WiFi.softAPConfig(ip, ip, subnet);
   WiFi.softAP( ap_ssid, ap_pass );
@@ -148,7 +146,6 @@ void setupWifi()
     server.handleClient();
     delay(1);
   }
-  regBlink();
 }
 
 void handleRootMain()
@@ -244,7 +241,6 @@ void handleGetHost()
   html += "<h1>Host Settings</h1>";
   html += "<form method='post'>";
   html += "  HOST  : <input type='text' name='host' placeholder='hogehoge.com'><br>";
-  html += "  FINGER  : <input type='text' name='fingerprint' placeholder='XX XX XX XX'><br>";
   html += "  <input type='submit'><br>";
   html += "<a href=\"/\"> Back<br>";
   html += "</form>";
@@ -254,12 +250,10 @@ void handleGetHost()
 void handlePostHost()
 {
   String host = server.arg("host");
-  String fingerprint = server.arg("fingerprint");
   
   // JSON作成
   String json = "{";
-  json += "\"host\":\"" + host + "\",";
-  json += "\"fingerprint\":\""+ fingerprint +"\"";
+  json += "\"host\":\"" + host + "\"";
   json += "}";
     
   File    fd = SPIFFS.open( setting_h, "w" );
@@ -271,10 +265,7 @@ void handlePostHost()
   html += "<p>Settings changed</p>";
   html += "<table>";
   html += "  <tr><td>HOST</td><td>" + host + "</td></tr>";
-  html += "  <tr><td>Fingerprint</td><td>" + fingerprint + "</td></tr>";
   html += "  <tr><td></td><td><a href=\"/\"> Back</td></tr>";
   html += "</table>";
   server.send( 200, "text/html", html );
 }
-
-

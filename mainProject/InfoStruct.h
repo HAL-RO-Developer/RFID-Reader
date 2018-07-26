@@ -24,7 +24,7 @@ typedef struct{
 /* --- URL管理構造体 --- */
 typedef struct{
   String host;        /* 接続ルーターSSID        */
-  String fingerprint; /* 接続ルーターパスワード  */
+  /*String fingerprint; // 接続ルーターパスワード  */
 } HOSTCONFIG;
 
 /* --- RFID管理構造体 --- */
